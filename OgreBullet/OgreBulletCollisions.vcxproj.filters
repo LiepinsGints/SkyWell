@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\Shapes\OgreBulletCollisionsConeShape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\Shapes\OgreBulletCollisionsConvexHullShape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\Shapes\OgreBulletCollisionsGImpactShape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\Shapes\OgreBulletCollisionsTrimeshShape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\Shapes\OgreBulletCollisionsSphereShape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\Shapes\OgreBulletCollisionsMinkowskiSumShape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\Shapes\OgreBulletCollisionsCylinderShape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\Shapes\OgreBulletCollisionsMultiSphereShape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\Shapes\OgreBulletCollisionsStaticPlaneShape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\Shapes\OgreBulletCollisionsCapsuleShape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\Shapes\OgreBulletCollisionsTriangleShape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\Shapes\OgreBulletCollisionsCompoundShape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\Shapes\OgreBulletCollisionsBoxShape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\Shapes\OgreBulletCollisionsTerrainShape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\OgreBulletCollisionsObjectState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\OgreBulletCollisionsRay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\OgreBulletCollisionsWorld.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\Debug\OgreBulletCollisionsDebugContact.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\Debug\OgreBulletCollisionsDebugDrawer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\Debug\OgreBulletCollisionsDebugShape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\Debug\OgreBulletCollisionsDebugLines.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\OgreBulletCollisionsObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\Utils\OgreBulletCollisionsMeshToShapeConverter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Collisions\src\OgreBulletCollisionsShape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="F:\Source\OgreBullet\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{5E0B8591-5A06-44D3-8B6C-EC56D65C633B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

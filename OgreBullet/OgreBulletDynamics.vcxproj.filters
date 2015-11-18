@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="F:\Source\OgreBullet\Dynamics\src\OgreBulletDynamicsConstraint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Dynamics\src\Constraints\OgreBulletDynamicsRaycastVehicle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Dynamics\src\Constraints\OgreBulletDynamicsPoint2pointConstraint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Dynamics\src\Constraints\OgreBulletDynamics6DofConstraint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Dynamics\src\Constraints\OgreBulletDynamics6DofSpringConstraint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Dynamics\src\Constraints\OgreBulletDynamicsConeTwistConstraint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Dynamics\src\Constraints\OgreBulletDynamicsHingeConstraint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Dynamics\src\OgreBulletDynamicsRigidBody.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Dynamics\src\OgreBulletDynamicsObjectState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Dynamics\src\OgreBulletDynamicsWorld.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\Source\OgreBullet\Dynamics\src\Prefab\OgreBulletDynamicsRagDoll.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="F:\Source\OgreBullet\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{5E0B8591-5A06-44D3-8B6C-EC56D65C633B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

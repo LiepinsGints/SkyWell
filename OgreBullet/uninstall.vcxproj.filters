@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="F:\Source\OgreBullet\CMakeLists.txt" />
+    <CustomBuild Include="G:\Projects\OgreBullet\CMakeFiles\467d4c89b78c13f9f3d6896d2bb6733b\uninstall.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="G:\Projects\OgreBullet\CMakeFiles\uninstall" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{5D92CAE1-6749-465F-BF25-B87AE681503A}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
