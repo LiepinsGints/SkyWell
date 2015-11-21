@@ -14,6 +14,7 @@
 #include "OgreBulletDynamicsRigidBody.h"				 // for OgreBullet
 #include "Shapes/OgreBulletCollisionsStaticPlaneShape.h" // for static planes
 #include "Shapes/OgreBulletCollisionsBoxShape.h"		 // for Boxes
+#include "Shapes/OgreBulletCollisionsCapsuleShape.h"
 
 
 
@@ -58,6 +59,7 @@ private:
 	/************custom****************/
 	Controls* controls;
 	OgreBulletDynamics::RigidBody *ninjaBody;
+	SceneNode* ninjaNode;
 	/***********Create scene******************/
 	void createScene() {
 		// Start Bullet
@@ -66,12 +68,21 @@ private:
 			Ogre::Vector3(10000, 10000, 10000));
 		mWorld = new OgreBulletDynamics::DynamicsWorld(mSceneMgr, bounds, gravityVector);
 
-		// add Debug info display tool
+		/************DEBUG*************/
 		debugDrawer = new OgreBulletCollisions::DebugDrawer();
-		debugDrawer->setDrawWireframe(false);	// we want to see the Bullet containers
-
+		debugDrawer->setDrawWireframe(true);	// we want to see the Bullet containers
+		//
+		debugDrawer->setDebugMode(OgreBulletCollisions::DebugDrawer::DBG_MAX_DEBUG_DRAW_MODE);
+		debugDrawer->setDrawAabb(true);
+		debugDrawer->setDrawContactPoints(true);
+		debugDrawer->setDrawFeaturesText(true);
+		//
 		mWorld->setDebugDrawer(debugDrawer);
-		mWorld->setShowDebugShapes(false);		// enable it if you want to see the Bullet containers
+		mWorld->setShowDebugShapes(true);		// enable it if you want to see the Bullet containers
+
+		
+
+
 		SceneNode *node = mSceneMgr->getRootSceneNode()->createChildSceneNode("debugDrawer", Ogre::Vector3::ZERO);
 		node->attachObject(static_cast <SimpleRenderable *> (debugDrawer));
 		// Set ambient light
@@ -96,8 +107,7 @@ private:
 
 		// add collision detection to it
 		OgreBulletCollisions::CollisionShape *Shape;
-		Shape = new OgreBulletCollisions::StaticPlaneCollisionShape(Ogre::Vector3(0, 1, 0), 0); // (normal vector, distance)
-																								// a body is needed for the shape
+		Shape = new OgreBulletCollisions::StaticPlaneCollisionShape(Ogre::Vector3(0, 1, 0), 0); 
 		OgreBulletDynamics::RigidBody *defaultPlaneBody = new OgreBulletDynamics::RigidBody("BasePlane",
 			mWorld);
 		defaultPlaneBody->setStaticShape(Shape, 0.1, 0.8);// (shape, restitution, friction)
@@ -105,56 +115,53 @@ private:
 		mShapes.push_back(Shape);
 		mBodies.push_back(defaultPlaneBody);
 		//---------------------->Ninja
-		Vector3 size = Vector3::ZERO;	// size of the box
-										// starting position of the box
-		//Vector3 position = (mCamera->getDerivedPosition() + mCamera->getDerivedDirection().normalisedCopy() * 10);
 		Vector3 position(0.,200,0.);
 		Ogre::Entity* ninjaEntity = mSceneMgr->createEntity("Player","ninja.mesh");
 		// we need the bounding box of the box to be able to set the size of the Bullet-box
 		AxisAlignedBox boundingB = ninjaEntity->getBoundingBox();
-		size = boundingB.getSize(); 
-		size /= 2.0f; // only the half needed
-		size *= 0.80f;	// Bullet margin is a bit bigger so we need a smaller size
-
+		float height = (boundingB.getSize().y * (1.0f - Ogre::MeshManager::getSingleton().getBoundsPaddingFactor()))/2.0f;
+		float width = (boundingB.getSize().x * (1.0f - Ogre::MeshManager::getSingleton().getBoundsPaddingFactor())) / 2.0f;
+		
 		origin = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 		origin->attachObject(ninjaEntity);
-		SceneNode* ninjaNode = origin->createChildSceneNode();
-		ninjaNode->attachObject(mCamera);
+		origin->attachObject(mCamera);
+		//ninjaNode = origin->createChildSceneNode();
+		//ninjaNode->attachObject(mCamera);
 
 		origin->scale(0.05f, 0.05f, 0.05f);	// the cube is too big for us
-		size *= 0.05f;						// don't forget to scale down the Bullet-box too
-		OgreBulletCollisions::BoxCollisionShape *sceneBoxShape = new OgreBulletCollisions::BoxCollisionShape(size);
-		// and the Bullet rigid body
-		//btRigidBody::setAngularFactor(btVector3(Yaw, Pitch, Roll));
+		OgreBulletCollisions::CapsuleCollisionShape *sceneCapsuleShape
+			= new OgreBulletCollisions::CapsuleCollisionShape(width*0.05f,
+				height*0.05f,
+				Vector3(0, 1, 0));
+
 		ninjaBody = new OgreBulletDynamics::RigidBody(
 			"NinjaRigidBody" + StringConverter::toString(mNumEntitiesInstanced),
 			mWorld);
 		
-
 		ninjaBody->setShape(origin,
-			sceneBoxShape,
+			sceneCapsuleShape,
 			0.6f,			// dynamic body restitution
 			0.6f,			// dynamic body friction
-			2.0f, 			// dynamic bodymass
-			position,		// starting position of the box
+			85.0f, 			// dynamic bodymass
+			Vector3(position.x,position.y,position.z),		// starting position of the box
 			Quaternion(1, 0, 0, 0));// orientation of the box
+		// ent->getParentSceneNode()->_getDerivedPosition(),      
+        //ent->getParentSceneNode()->_getDerivedOrientation()
+		
 		mNumEntitiesInstanced++;
-		//defaultBody->setOrientation(btQuaternion().z.angle(40));
-		//ninjaNode->rotate(Ogre::Quaternion(Ogre::Degree(180), Ogre::Vector3(1, 1, 0)), Ogre::Node::TransformSpace::TS_WORLD);
 
-		ninjaBody->setLinearVelocity(
-			mCamera->getDerivedDirection().normalisedCopy() * 1.0f);
+		ninjaBody->setLinearVelocity(mCamera->getDerivedDirection().normalisedCopy() * 1.0f);
 		//Prevent falling over
 		ninjaBody->getBulletRigidBody()->setAngularFactor(btVector3(0.0f, 1.0f, 0.0f));
-
-		mShapes.push_back(sceneBoxShape);
+		//Prevent rotation after hitting objects
+		ninjaBody->getBulletRigidBody()->setRestitution(0.0f);
+		ninjaBody->getBulletRigidBody()->setAngularFactor(0.0f);
+		//
+		
+		//ninjaBody
+		mShapes.push_back(sceneCapsuleShape);
 		mBodies.push_back(ninjaBody);
 
-		//ninjaBody->setLinearVelocity(Ogre::Vector3(0.0, 0.0, 100.0));
-			
-		//Camera behind ninja
-		//mCamera->setPosition(ninjaNode->getPosition().x, ninjaNode->getPosition().y+10, ninjaNode->getPosition().z+20);
-		//mCamera->lookAt(ninjaNode->getPosition().x, ninjaNode->getPosition().y + 5, ninjaNode->getPosition().z);
 
 	}//<-- end
 	/******************CREATE CAMERA******************************/

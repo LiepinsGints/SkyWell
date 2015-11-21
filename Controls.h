@@ -20,6 +20,8 @@
 #include "Shapes/OgreBulletCollisionsStaticPlaneShape.h" // for static planes
 #include "Shapes/OgreBulletCollisionsBoxShape.h"		 // for Boxes
 
+#include "Math3D.h"
+
 using namespace Ogre;
 class Controls {
 
@@ -27,7 +29,7 @@ public:
 	Controls(Ogre::Root* _mRoot, Ogre::RenderWindow* _mWindow, Ogre::Camera* _mCamera,
 		std::deque<OgreBulletDynamics::RigidBody *> _mBodies, std::deque<OgreBulletCollisions::CollisionShape *>  _mShapes,
 		OgreBulletDynamics::DynamicsWorld *_mWorld, int  _mNumEntitiesInstanced, Ogre::SceneManager* _mSceneMgr,
-		Ogre::SceneNode* _origin, OgreBulletDynamics::RigidBody *_player
+		Ogre::SceneNode* _origin, OgreBulletDynamics::RigidBody *_player, SceneNode* _ninjaNode
 		) {
 		mRoot = _mRoot;
 		mWindow = _mWindow;
@@ -39,10 +41,12 @@ public:
 		mNumEntitiesInstanced = _mNumEntitiesInstanced;
 		player = _player;
 		origin = _origin;
+		ninjaNode = _ninjaNode;
 		up = false;
 		back = false;
 		left = false;
 		right = false;
+		jump = false;
 		
 		Ogre::LogManager::getSingletonPtr()->logMessage("*** Initializing OIS ***");
 		OIS::ParamList pl;
@@ -97,7 +101,7 @@ public:
 				sceneBoxShape,
 				0.6f,			// dynamic body restitution
 				0.6f,			// dynamic body friction
-				1.0f, 			// dynamic bodymass
+				100.0f, 			// dynamic bodymass
 				position,		// starting position of the box
 				Quaternion(0, 0, 0, 1));// orientation of the box
 			mNumEntitiesInstanced++;
@@ -111,21 +115,33 @@ public:
 		}
 
 		//Basic camera movement
+		
+		//	mCamera->getDerivedPosition() + mCamera->getDerivedDirection().normalisedCopy() * 10
+		
 		if (mKeyboard->isKeyDown(OIS::KC_UP)) {
-			player->enableActiveState();
-			player->setLinearVelocity(Ogre::Vector3(0.0, 0.0, -10.0));
+			if(jump!=true)
+			up = true;		
 		}
 		if (mKeyboard->isKeyDown(OIS::KC_DOWN)) {
-			player->enableActiveState();
-			player->setLinearVelocity(Ogre::Vector3(0.0, 0.0, 10.0));
+			if (jump != true)
+			back = true;
 		}
 		if (mKeyboard->isKeyDown(OIS::KC_LEFT)) {
-			player->enableActiveState();
-			player->setLinearVelocity(Ogre::Vector3(+10.0, 0.0, 0));
+			if (jump != true)
+			left = true;
+			/*player->enableActiveState();
+			player->setLinearVelocity(Ogre::Vector3(+10.0, 0.0, 0));*/
 		}
 		if (mKeyboard->isKeyDown(OIS::KC_RIGHT)) {
-			player->enableActiveState();
-			player->setLinearVelocity(Ogre::Vector3(-10.0, 0.0, 0));
+			if (jump != true)
+			right = true;
+			/*player->enableActiveState();
+			player->setLinearVelocity(Ogre::Vector3(-10.0, 0.0, 0));*/
+		}
+		if (mKeyboard->isKeyDown(OIS::KC_NUMPAD0)) {
+			if(jump!=true){
+			jump = true;
+			}
 		}
 		//screen size change
 		if (mKeyboard->isKeyDown(OIS::KC_O)) {
@@ -134,6 +150,68 @@ public:
 		if (mKeyboard->isKeyDown(OIS::KC_P)) {
 			mWindow->setFullscreen(true, 1024, 768);
 		}
+
+		//Key release
+		if (!mKeyboard->isKeyDown(OIS::KC_UP)) {
+			if (up == true) {
+				player->setLinearVelocity(Vector3(0, 0, 0));
+				up = false;
+			}
+		}
+		if (!mKeyboard->isKeyDown(OIS::KC_DOWN)) {
+			if(back==true){
+				player->setLinearVelocity(Vector3(0, 0, 0));
+				back = false;
+			}
+		}
+		if (!mKeyboard->isKeyDown(OIS::KC_LEFT)) {
+			if(left==true){
+				player->setAngularVelocity(Vector3(0, 0, 0));
+				left = false;
+			}
+		}
+		if (!mKeyboard->isKeyDown(OIS::KC_RIGHT)) {
+			if(right==true){
+				player->setAngularVelocity(Vector3(0, 0, 0));
+				right = false;
+			}
+		}
+		if (!mKeyboard->isKeyDown(OIS::KC_NUMPAD0)) {
+			jump = false;
+
+		}
+		//States
+		if (up==true) {
+			player->enableActiveState();
+			Vector3  direction = mCamera->getDerivedDirection().normalisedCopy() * 20.0f;
+			player->setLinearVelocity(Vector3(direction.x,0,direction.z) );
+		}
+
+		if(back==true){
+			player->enableActiveState();
+			Vector3  direction = mCamera->getDerivedDirection().normalisedCopy() * (-20.0f);
+			player->setLinearVelocity(Vector3(direction.x, 0, direction.z));
+
+		}
+		if (left == true) {
+			player->enableActiveState();
+			player->setAngularVelocity(Vector3(0, 1, 0));
+			//player->setCenterOfMassTransform(tr);
+			//player->c
+		}
+		if (right == true) {
+			player->enableActiveState();
+			player->setAngularVelocity(Vector3(0, -1, 0));
+		}
+		if (jump == true) {
+			player->enableActiveState();
+				Vector3  direction = mCamera->getDerivedDirection().normalisedCopy();
+				player->setLinearVelocity(Vector3(direction.x*8, direction.y *(-15), direction.z*8));
+
+		}
+
+
+
 		return true;
 	}
 private:
@@ -148,18 +226,21 @@ private:
 	Ogre::SceneNode* objectNode;
 	Ogre::SceneNode* origin;
 	Ogre::SceneNode* cameraNode;
+	SceneNode* ninjaNode;
 	bool up;
 	bool back;
 	bool left;
 	bool right;
+	bool jump;
 
 	std::deque<OgreBulletDynamics::RigidBody *> mBodies;
 	std::deque<OgreBulletCollisions::CollisionShape *>  mShapes;
 	OgreBulletDynamics::DynamicsWorld *mWorld;
 	int  mNumEntitiesInstanced;
 	OgreBulletDynamics::RigidBody *player;
+	Math3D math3D;
 
-
+	
 };
 
 

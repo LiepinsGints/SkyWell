@@ -163,6 +163,7 @@
     <ClInclude Include="Controls.h" />
     <ClInclude Include="Core.h" />
     <ClInclude Include="CustomObjects.h" />
+    <ClInclude Include="Math3D.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cpp" />

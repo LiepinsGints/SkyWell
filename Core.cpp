@@ -89,7 +89,7 @@ bool Core::go()
 	if (!(mRoot->restoreConfig() || mRoot->showConfigDialog()))
 		return false;
 	/************Init window size******************/
-	mWindow = mRoot->initialise(true, "TutorialApplication Render Window");
+	mWindow = mRoot->initialise(true, "SkyWell");
 	mWindow->setFullscreen(false, 1024, 768);
 
 	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
@@ -103,7 +103,7 @@ bool Core::go()
 	createScene();
 	/******************************OIS********************************/
 	//createOIS();
-	controls = new Controls(mRoot, mWindow, mCamera, mBodies, mShapes, mWorld, mNumEntitiesInstanced, mSceneMgr,origin,ninjaBody);
+	controls = new Controls(mRoot, mWindow, mCamera, mBodies, mShapes, mWorld, mNumEntitiesInstanced, mSceneMgr,origin,ninjaBody, ninjaNode);
 	//controls->init(mRoot, mWindow, mCamera);
 
 	windowResized(mWindow);
@@ -122,6 +122,7 @@ bool Core::frameRenderingQueued(const Ogre::FrameEvent& fe)
 	//listenOIS();
 	//controls->init(mRoot, mWindow, mCamera);
     controls->listen();
+
 	//return true;
 }
 
