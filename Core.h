@@ -115,6 +115,8 @@ private:
 		mShapes.push_back(Shape);
 		mBodies.push_back(defaultPlaneBody);
 		
+		//Create sky
+		mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8); 
 
 	}//<-- end
 	/******************CREATE CAMERA******************************/

@@ -183,6 +183,15 @@ public:
 	bool listen(const Ogre::FrameEvent& fe) {
 		mKeyboard->capture();
 		mMouse->capture();
+
+		if (player->getLinearVelocity().y > -0.01 && player->getLinearVelocity().y < 0.01) {
+			lock = false;
+		}
+		else
+		{
+			lock=true;
+		}
+
 		if (mKeyboard->isKeyDown(OIS::KC_ESCAPE)) return false;
 		else if (mKeyboard->isKeyDown(OIS::KC_B))
 		{
@@ -263,6 +272,9 @@ public:
 		if (mKeyboard->isKeyDown(OIS::KC_NUMPAD0) && lock == false) {
 			if(jump!=true){
 				jump = true;
+				player->enableActiveState();
+				Vector3  direction = mCamera->getDerivedDirection().normalisedCopy();
+				player->setLinearVelocity(Vector3(direction.x*speed / 3, speed*0.5, direction.z*speed / 3));
 				setAnimation(2);
 			}
 		}
@@ -304,7 +316,9 @@ public:
 			}
 		}
 		if (!mKeyboard->isKeyDown(OIS::KC_NUMPAD0)) {
-			jump = false;
+			if (player->getLinearVelocity().y > -0.01 && player->getLinearVelocity().y< 0.01){
+				jump = false;
+			}
 
 		}
 		//States
@@ -328,12 +342,7 @@ public:
 			player->enableActiveState();
 			player->setAngularVelocity(Vector3(0, -1, 0));
 		}
-		if (jump == true) {
-				player->enableActiveState();
-				Vector3  direction = mCamera->getDerivedDirection().normalisedCopy();
-				player->setLinearVelocity(Vector3(direction.x*speed/3, speed*0.5, direction.z*speed/3));
 
-		}
 
 
 
