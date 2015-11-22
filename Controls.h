@@ -19,6 +19,7 @@
 #include "OgreBulletDynamicsRigidBody.h"				 // for OgreBullet
 #include "Shapes/OgreBulletCollisionsStaticPlaneShape.h" // for static planes
 #include "Shapes/OgreBulletCollisionsBoxShape.h"		 // for Boxes
+#include "Shapes/OgreBulletCollisionsCapsuleShape.h"
 
 #include "Math3D.h"
 
@@ -28,8 +29,7 @@ class Controls {
 public:
 	Controls(Ogre::Root* _mRoot, Ogre::RenderWindow* _mWindow, Ogre::Camera* _mCamera,
 		std::deque<OgreBulletDynamics::RigidBody *> _mBodies, std::deque<OgreBulletCollisions::CollisionShape *>  _mShapes,
-		OgreBulletDynamics::DynamicsWorld *_mWorld, int  _mNumEntitiesInstanced, Ogre::SceneManager* _mSceneMgr,
-		Ogre::SceneNode* _origin, OgreBulletDynamics::RigidBody *_player, SceneNode* _ninjaNode
+		OgreBulletDynamics::DynamicsWorld *_mWorld, int  _mNumEntitiesInstanced, Ogre::SceneManager* _mSceneMgr
 		) {
 		mRoot = _mRoot;
 		mWindow = _mWindow;
@@ -39,14 +39,18 @@ public:
 		mWorld = _mWorld;
 		mSceneMgr = _mSceneMgr;
 		mNumEntitiesInstanced = _mNumEntitiesInstanced;
-		player = _player;
+		createCharacter();
+		/*player = _player;
 		origin = _origin;
-		ninjaNode = _ninjaNode;
+		ninjaNode = _ninjaNode;*/
 		up = false;
 		back = false;
 		left = false;
 		right = false;
 		jump = false;
+		lock = false;
+		animationId = 0;
+		speed = 20;
 		
 		Ogre::LogManager::getSingletonPtr()->logMessage("*** Initializing OIS ***");
 		OIS::ParamList pl;
@@ -65,8 +69,118 @@ public:
 			mInputMgr->createInputObject(OIS::OISMouse, false));
 
 	}
+	void createCharacter() {
+		Vector3 position(0., 200, 0.);
+		playerEntity = mSceneMgr->createEntity("Player", "Sinbad.mesh");
+		//Animation
+		// Set animation blend mode to additive / cumulative.
+		playerEntity->getSkeleton()->setBlendMode(ANIMBLEND_CUMULATIVE);
+
+		// Get the two halves of the idle animation.
+		animationId = 0;
+		mAnimationStateBase = playerEntity->getAnimationState("IdleBase");
+		mAnimationStateTop = playerEntity->getAnimationState("IdleTop");
+
+		// Enable both of them and set them to loop.
+		mAnimationStateBase->setLoop(true);
+		mAnimationStateBase->setEnabled(true);
+		mAnimationStateTop->setLoop(true);
+		mAnimationStateTop->setEnabled(true);
+		//Sinbad.mesh ninja.mesh
+		// we need the bounding box of the box to be able to set the size of the Bullet-box
+		AxisAlignedBox boundingB = playerEntity->getBoundingBox();
+		float height = (boundingB.getSize().y * (1.0f - Ogre::MeshManager::getSingleton().getBoundsPaddingFactor())) / 2.0f;
+		float width = (boundingB.getSize().x * (1.0f - Ogre::MeshManager::getSingleton().getBoundsPaddingFactor())) / 2.0f;
+
+		origin = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+		origin->attachObject(playerEntity);
+		//origin->attachObject(mCamera);
+		camNode = origin->createChildSceneNode();
+		camNode->attachObject(mCamera);
+		camNode->rotate(Ogre::Quaternion(Ogre::Degree(180), Ogre::Vector3(0, 1, 0)), Ogre::Node::TransformSpace::TS_WORLD);
+
+		origin->scale(0.5f, 0.5f, 0.5f);	// the cube is too big for us
+		OgreBulletCollisions::CapsuleCollisionShape *sceneCapsuleShape
+			= new OgreBulletCollisions::CapsuleCollisionShape(width*0.5f,
+				(height*0.5f)*0.55f,
+				Vector3(0, 1, 0));
+
+		player = new OgreBulletDynamics::RigidBody(
+			"PlayerRigidBody" + StringConverter::toString(mNumEntitiesInstanced),
+			mWorld);
+
+		player->setShape(origin,
+			sceneCapsuleShape,
+			0.0f,			// dynamic body restitution
+			1.0f,			// dynamic body friction
+			10.0f, 			// dynamic bodymass
+			Vector3(position.x, position.y, position.z),		// starting position of the box
+			Quaternion(1, 0, 0, 0));// orientation of the box
+
+		mNumEntitiesInstanced++;
+
+		player->setLinearVelocity(mCamera->getDerivedDirection().normalisedCopy() * 1.0f);
+		//Prevent falling over
+		player->getBulletRigidBody()->setAngularFactor(btVector3(0.0f, 1.0f, 0.0f));
+		//Prevent rotation after hitting objects
+		player->getBulletRigidBody()->setRestitution(0.0f);
+		player->getBulletRigidBody()->setAngularFactor(0.0f);
+		//
+
+		//playerBody
+		mShapes.push_back(sceneCapsuleShape);
+		mBodies.push_back(player);
+
+	}
 	
-	bool listen() {
+	void setAnimation(int _animationId) {
+		//disable previous
+		if (animationId != _animationId) {
+
+				playerEntity->getAnimationState("RunBase")->setEnabled(false);
+				playerEntity->getAnimationState("RunTop")->setEnabled(false);
+
+				playerEntity->getAnimationState("IdleBase")->setEnabled(false);
+				playerEntity->getAnimationState("IdleTop")->setEnabled(false);
+
+				
+
+			//Set new animation
+			switch (_animationId) {
+			case 0://idle
+				mAnimationStateBase = playerEntity->getAnimationState("IdleBase");
+				mAnimationStateTop = playerEntity->getAnimationState("IdleTop");
+				break;
+			case 1://run
+				mAnimationStateBase = playerEntity->getAnimationState("RunBase");
+				mAnimationStateTop = playerEntity->getAnimationState("RunTop");
+				break;
+			case 2://run
+				
+				break;
+			}
+			animationId = _animationId;
+			// Enable both of them and set them to loop.
+			mAnimationStateBase->setLoop(true);
+			mAnimationStateBase->setEnabled(true);
+			mAnimationStateTop->setLoop(true);
+			mAnimationStateTop->setEnabled(true);
+		}
+	}
+	void updateAnimations(Ogre::Real elapsedTime) {
+		Ogre::Real time = elapsedTime;
+		if (back == true) {
+			time /= 2;
+		}
+		if ((left || right) && (up == false && back == false)) {
+			time /= 6;
+		}
+
+		mAnimationStateBase->addTime(time);
+		mAnimationStateTop->addTime(time);
+	}
+
+	bool listen(const Ogre::FrameEvent& fe) {
 		mKeyboard->capture();
 		mMouse->capture();
 		if (mKeyboard->isKeyDown(OIS::KC_ESCAPE)) return false;
@@ -118,29 +232,38 @@ public:
 		
 		//	mCamera->getDerivedPosition() + mCamera->getDerivedDirection().normalisedCopy() * 10
 		
-		if (mKeyboard->isKeyDown(OIS::KC_UP)) {
-			if(jump!=true)
-			up = true;		
+		if (mKeyboard->isKeyDown(OIS::KC_UP) && lock==false) {
+			if (jump != true) {
+				up = true;	
+				setAnimation(1);
+			}
+				
 		}
-		if (mKeyboard->isKeyDown(OIS::KC_DOWN)) {
-			if (jump != true)
-			back = true;
+		if (mKeyboard->isKeyDown(OIS::KC_DOWN) && lock == false) {
+			if (jump != true) {
+				back = true;
+				setAnimation(1);
+			}
+			
 		}
-		if (mKeyboard->isKeyDown(OIS::KC_LEFT)) {
-			if (jump != true)
-			left = true;
-			/*player->enableActiveState();
-			player->setLinearVelocity(Ogre::Vector3(+10.0, 0.0, 0));*/
+		if (mKeyboard->isKeyDown(OIS::KC_LEFT) && lock == false) {
+			if (jump != true) {
+				left = true;
+				setAnimation(1);
+			}
+			
 		}
-		if (mKeyboard->isKeyDown(OIS::KC_RIGHT)) {
-			if (jump != true)
-			right = true;
-			/*player->enableActiveState();
-			player->setLinearVelocity(Ogre::Vector3(-10.0, 0.0, 0));*/
+		if (mKeyboard->isKeyDown(OIS::KC_RIGHT) && lock == false) {
+			if (jump != true) {
+				right = true;
+				setAnimation(1);
+			}
+			
 		}
-		if (mKeyboard->isKeyDown(OIS::KC_NUMPAD0)) {
+		if (mKeyboard->isKeyDown(OIS::KC_NUMPAD0) && lock == false) {
 			if(jump!=true){
-			jump = true;
+				jump = true;
+				setAnimation(2);
 			}
 		}
 		//screen size change
@@ -156,24 +279,28 @@ public:
 			if (up == true) {
 				player->setLinearVelocity(Vector3(0, 0, 0));
 				up = false;
+				setAnimation(0);
 			}
 		}
 		if (!mKeyboard->isKeyDown(OIS::KC_DOWN)) {
 			if(back==true){
 				player->setLinearVelocity(Vector3(0, 0, 0));
 				back = false;
+				setAnimation(0);
 			}
 		}
 		if (!mKeyboard->isKeyDown(OIS::KC_LEFT)) {
 			if(left==true){
 				player->setAngularVelocity(Vector3(0, 0, 0));
 				left = false;
+				if(up==false && back==false)setAnimation(0);
 			}
 		}
 		if (!mKeyboard->isKeyDown(OIS::KC_RIGHT)) {
 			if(right==true){
 				player->setAngularVelocity(Vector3(0, 0, 0));
 				right = false;
+				if (up == false && back == false)setAnimation(0);
 			}
 		}
 		if (!mKeyboard->isKeyDown(OIS::KC_NUMPAD0)) {
@@ -181,32 +308,30 @@ public:
 
 		}
 		//States
-		if (up==true) {
+		if (up==true && lock==false) {
 			player->enableActiveState();
-			Vector3  direction = mCamera->getDerivedDirection().normalisedCopy() * 20.0f;
-			player->setLinearVelocity(Vector3(direction.x,0,direction.z) );
+			Vector3  direction = mCamera->getDerivedDirection().normalisedCopy() * speed;		
+			player->setLinearVelocity(Vector3(direction.x, player->getGravity().y,direction.z) );
 		}
 
-		if(back==true){
+		if(back==true && lock == false){
 			player->enableActiveState();
-			Vector3  direction = mCamera->getDerivedDirection().normalisedCopy() * (-20.0f);
-			player->setLinearVelocity(Vector3(direction.x, 0, direction.z));
+			Vector3  direction = mCamera->getDerivedDirection().normalisedCopy() * (-speed/2);
+			player->setLinearVelocity(Vector3(direction.x, player->getGravity().y, direction.z));
 
 		}
 		if (left == true) {
 			player->enableActiveState();
 			player->setAngularVelocity(Vector3(0, 1, 0));
-			//player->setCenterOfMassTransform(tr);
-			//player->c
 		}
 		if (right == true) {
 			player->enableActiveState();
 			player->setAngularVelocity(Vector3(0, -1, 0));
 		}
 		if (jump == true) {
-			player->enableActiveState();
+				player->enableActiveState();
 				Vector3  direction = mCamera->getDerivedDirection().normalisedCopy();
-				player->setLinearVelocity(Vector3(direction.x*8, direction.y *(-15), direction.z*8));
+				player->setLinearVelocity(Vector3(direction.x*speed/3, speed*0.5, direction.z*speed/3));
 
 		}
 
@@ -226,12 +351,15 @@ private:
 	Ogre::SceneNode* objectNode;
 	Ogre::SceneNode* origin;
 	Ogre::SceneNode* cameraNode;
-	SceneNode* ninjaNode;
+	SceneNode* camNode;
 	bool up;
 	bool back;
 	bool left;
 	bool right;
 	bool jump;
+	bool lock;
+
+	Ogre::Real speed;
 
 	std::deque<OgreBulletDynamics::RigidBody *> mBodies;
 	std::deque<OgreBulletCollisions::CollisionShape *>  mShapes;
@@ -239,6 +367,35 @@ private:
 	int  mNumEntitiesInstanced;
 	OgreBulletDynamics::RigidBody *player;
 	Math3D math3D;
+	//Animations
+	static const int NUM_ANIMS = 13;
+	Ogre::AnimationState* mAnimationStateTop;
+	Ogre::AnimationState* mAnimationStateBase;
+	Ogre::Entity* playerEntity;
+	int animationId;
+	enum AnimID
+	{
+		ANIM_IDLE_BASE,
+		ANIM_IDLE_TOP,
+
+		ANIM_RUN_BASE,
+		ANIM_RUN_TOP,
+
+		ANIM_HANDS_CLOSED,
+		ANIM_HANDS_RELAXED,
+
+		ANIM_DRAW_SWORDS,
+
+		ANIM_SLICE_VERTICAL,
+		ANIM_SLICE_HORIZONTAL,
+
+		ANIM_DANCE,
+
+		ANIM_JUMP_START,
+		ANIM_JUMP_LOOP,
+		ANIM_JUMP_END,
+		ANIM_NONE
+	};
 
 	
 };

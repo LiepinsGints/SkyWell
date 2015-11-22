@@ -103,7 +103,8 @@ bool Core::go()
 	createScene();
 	/******************************OIS********************************/
 	//createOIS();
-	controls = new Controls(mRoot, mWindow, mCamera, mBodies, mShapes, mWorld, mNumEntitiesInstanced, mSceneMgr,origin,ninjaBody, ninjaNode);
+	controls = new Controls(mRoot, mWindow, mCamera, mBodies, mShapes, mWorld, mNumEntitiesInstanced, mSceneMgr);
+	//,origin,ninjaBody, camNode
 	//controls->init(mRoot, mWindow, mCamera);
 
 	windowResized(mWindow);
@@ -121,7 +122,9 @@ bool Core::frameRenderingQueued(const Ogre::FrameEvent& fe)
 	if (mWindow->isClosed()) return false;
 	//listenOIS();
 	//controls->init(mRoot, mWindow, mCamera);
-    controls->listen();
+	controls->updateAnimations(fe.timeSinceLastFrame);
+    controls->listen(fe);
+	
 
 	//return true;
 }
