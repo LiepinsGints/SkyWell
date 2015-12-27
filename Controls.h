@@ -111,9 +111,9 @@ public:
 
 		player->setShape(origin,
 			sceneCapsuleShape,
-			0.0f,			// dynamic body restitution
-			1.0f,			// dynamic body friction
-			10.0f, 			// dynamic bodymass
+			0.1f,			// dynamic body restitution
+			0.7f,			// dynamic body friction
+			5.0f, 			// dynamic bodymass
 			Vector3(position.x, position.y, position.z),		// starting position of the box
 			Quaternion(1, 0, 0, 0));// orientation of the box
 
@@ -184,7 +184,7 @@ public:
 		mKeyboard->capture();
 		mMouse->capture();
 
-		if (player->getLinearVelocity().y > -0.01 && player->getLinearVelocity().y < 0.01) {
+		if (player->getLinearVelocity().y > -0.05 && player->getLinearVelocity().y < 0.05) {
 			lock = false;
 		}
 		else

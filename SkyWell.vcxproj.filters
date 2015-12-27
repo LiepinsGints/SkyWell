@@ -27,6 +27,9 @@
     <ClInclude Include="Math3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TerrainGen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cpp">
