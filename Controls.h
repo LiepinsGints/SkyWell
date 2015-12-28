@@ -111,7 +111,7 @@ public:
 
 		player->setShape(origin,
 			sceneCapsuleShape,
-			0.1f,			// dynamic body restitution
+			0.0f,			// dynamic body restitution
 			0.7f,			// dynamic body friction
 			5.0f, 			// dynamic bodymass
 			Vector3(position.x, position.y, position.z),		// starting position of the box

@@ -25,11 +25,11 @@ public:
 		directionalLight = _directionalLight;
 		//Terrain defs
 		terrainSize=513;
-		terrainWorldSize=12000.0f;
+		terrainWorldSize=2046.0f;
 		inputScale = 300;
 		minBatchSize = 33;
 		maxBatchSize = 65;
-		img.load("terrain.png", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		img.load("map_04.png", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 	}
 	void loadTerrain() {
 		// Fog
