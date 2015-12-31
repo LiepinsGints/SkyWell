@@ -164,6 +164,7 @@
     <ClInclude Include="Core.h" />
     <ClInclude Include="CustomObjects.h" />
     <ClInclude Include="Math3D.h" />
+    <ClInclude Include="PhysicsManager.h" />
     <ClInclude Include="TerrainGen.h" />
   </ItemGroup>
   <ItemGroup>

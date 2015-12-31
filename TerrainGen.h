@@ -13,6 +13,8 @@
 #include "Shapes/OgreBulletCollisionsCapsuleShape.h"
 #include "Shapes/OgreBulletCollisionsTerrainShape.h" //terrain
 #include "bulletCollision/CollisionShapes/btHeightfieldTerrainShape.h"
+
+#include "PhysicsManager.h"
 using namespace Ogre;
 class TerrainGen {
 
@@ -154,25 +156,13 @@ public:
 		blendMap1->update();
 
 	}
-	void bulletTerrainshape(OgreBulletDynamics::DynamicsWorld *_mWorld,
-		std::deque<OgreBulletDynamics::RigidBody *> _mBodies,
-		std::deque<OgreBulletCollisions::CollisionShape *>  _mShapes
-		) {
-		//My
-		
-
-		//My
+	void bulletTerrainshape(PhysicsManager * physicsManager) {
 		unsigned page_size = mTerrainGroup->getTerrainSize();
 		Ogre::Vector3 terrainScale(terrainWorldSize / (page_size - 1),
 			inputScale,
 			terrainWorldSize / (page_size - 1));
 
 		float *heights = new float[page_size*page_size];
-
-		//
-
-
-		//
 		for (unsigned y = 0; y < page_size; ++y)
 		{
 			for (unsigned x = 0; x < page_size; ++x)
@@ -192,27 +182,20 @@ public:
 			true);
 
 		defaultTerrainBody = new OgreBulletDynamics::RigidBody("Terrain",
-			_mWorld);
+			physicsManager->getMWorld());
 
 		const float terrainBodyRestitution = 0.1f;
 		const float terrainBodyFriction = 0.8f;
 
-		/*Ogre::Vector3 terrainShiftPos((terrainScale.x * (page_size - 1) / 2), \
-			0,
-			(terrainScale.z * (page_size - 1) / 2));*/
 		Ogre::Vector3 terrainShiftPos(terrainScale.x / (page_size - 1), 0, terrainScale.z / (page_size - 1));
 		terrainShiftPos.y = terrainScale.y / 2 * terrainScale.y;
 
 		Ogre::SceneNode* pTerrainNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 		defaultTerrainBody->setStaticShape(pTerrainNode, mTerrainShape, terrainBodyRestitution, terrainBodyFriction, terrainShiftPos);
 
-		//My
-		
-		//
-		_mBodies.push_back(defaultTerrainBody);
-		_mShapes.push_back(mTerrainShape);
-		//_mShapes.push_back(terrainShape);
-		//_mBodies.push_back(terrainShape);
+		physicsManager->addMbodies(defaultTerrainBody);
+		physicsManager->addMshapes(mTerrainShape);
+
 	}
 	
 

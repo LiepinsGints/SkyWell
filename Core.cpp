@@ -31,7 +31,7 @@ Core::~Core()
 	Ogre::WindowEventUtilities::removeWindowEventListener(mWindow, this);
 
 	windowClosed(mWindow);
-
+	/*
 	// OgreBullet physic delete - RigidBodies
 	std::deque<OgreBulletDynamics::RigidBody *>::iterator itBody = mBodies.begin();
 	while (mBodies.end() != itBody)
@@ -52,6 +52,8 @@ Core::~Core()
 	mWorld->setDebugDrawer(0);
 	delete mWorld;
 	delete mRoot;
+	*/
+	physicsManager->clear();
 }
 
 bool Core::go()
@@ -103,7 +105,7 @@ bool Core::go()
 	createScene();
 	/******************************OIS********************************/
 	//createOIS();
-	controls = new Controls(mRoot, mWindow, mCamera, mBodies, mShapes, mWorld, mNumEntitiesInstanced, mSceneMgr);
+	controls = new Controls(mRoot, mWindow, mCamera,physicsManager, mSceneMgr);
 	//,origin,ninjaBody, camNode
 	//controls->init(mRoot, mWindow, mCamera);
 
@@ -159,8 +161,7 @@ void Core::windowClosed(Ogre::RenderWindow* rw)
 bool Core::frameStarted(const Ogre::FrameEvent& evt)
 {
 	if (mWindow->isClosed()) return false;
-
-	mWorld->stepSimulation(evt.timeSinceLastFrame);	// update Bullet Physics animation
+	physicsManager->getMWorld()->stepSimulation(evt.timeSinceLastFrame);
 
 	return true;
 }
@@ -168,8 +169,7 @@ bool Core::frameStarted(const Ogre::FrameEvent& evt)
 bool Core::frameEnded(const Ogre::FrameEvent& evt)
 {
 	if (mWindow->isClosed()) return false;
-
-	mWorld->stepSimulation(evt.timeSinceLastFrame);	// update Bullet Physics animation
+	physicsManager->getMWorld()->stepSimulation(evt.timeSinceLastFrame);
 
 	return true;
 }

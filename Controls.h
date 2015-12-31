@@ -22,27 +22,21 @@
 #include "Shapes/OgreBulletCollisionsCapsuleShape.h"
 
 #include "Math3D.h"
-
+#include "PhysicsManager.h"
 using namespace Ogre;
 class Controls {
 
 public:
 	Controls(Ogre::Root* _mRoot, Ogre::RenderWindow* _mWindow, Ogre::Camera* _mCamera,
-		std::deque<OgreBulletDynamics::RigidBody *> _mBodies, std::deque<OgreBulletCollisions::CollisionShape *>  _mShapes,
-		OgreBulletDynamics::DynamicsWorld *_mWorld, int  _mNumEntitiesInstanced, Ogre::SceneManager* _mSceneMgr
+		PhysicsManager * _physicsManager, Ogre::SceneManager* _mSceneMgr
 		) {
 		mRoot = _mRoot;
 		mWindow = _mWindow;
 		mCamera = _mCamera;
-		mBodies = _mBodies;
-		mShapes = _mShapes;
-		mWorld = _mWorld;
 		mSceneMgr = _mSceneMgr;
-		mNumEntitiesInstanced = _mNumEntitiesInstanced;
+		physicsManager = _physicsManager;
 		createCharacter();
-		/*player = _player;
-		origin = _origin;
-		ninjaNode = _ninjaNode;*/
+
 		up = false;
 		back = false;
 		left = false;
@@ -106,8 +100,8 @@ public:
 				Vector3(0, 1, 0));
 
 		player = new OgreBulletDynamics::RigidBody(
-			"PlayerRigidBody" + StringConverter::toString(mNumEntitiesInstanced),
-			mWorld);
+			"PlayerRigidBody" + StringConverter::toString(physicsManager->getEntitiesInstanced()),
+			physicsManager->getMWorld());
 
 		player->setShape(origin,
 			sceneCapsuleShape,
@@ -117,7 +111,8 @@ public:
 			Vector3(position.x, position.y, position.z),		// starting position of the box
 			Quaternion(1, 0, 0, 0));// orientation of the box
 
-		mNumEntitiesInstanced++;
+		//mNumEntitiesInstanced++;
+		physicsManager->setEntitiesInstanced(physicsManager->getEntitiesInstanced()+1);
 
 		player->setLinearVelocity(mCamera->getDerivedDirection().normalisedCopy() * 1.0f);
 		//Prevent falling over
@@ -128,8 +123,8 @@ public:
 		//
 
 		//playerBody
-		mShapes.push_back(sceneCapsuleShape);
-		mBodies.push_back(player);
+		physicsManager->addMbodies(player);
+		physicsManager->addMshapes(sceneCapsuleShape);
 
 	}
 	
@@ -200,7 +195,7 @@ public:
 			Vector3 position = (mCamera->getDerivedPosition() + mCamera->getDerivedDirection().normalisedCopy() * 10);
 			// create an ordinary, Ogre mesh with texture
 			Entity *entity = mSceneMgr->createEntity(
-				"Box" + StringConverter::toString(mNumEntitiesInstanced),
+				"Box" + StringConverter::toString(physicsManager->getEntitiesInstanced()),
 				"cube.mesh");
 			entity->setCastShadows(true);
 			// we need the bounding box of the box to be able to set the size of the Bullet-box
@@ -218,8 +213,8 @@ public:
 			OgreBulletCollisions::BoxCollisionShape *sceneBoxShape = new OgreBulletCollisions::BoxCollisionShape(size);
 			// and the Bullet rigid body
 			OgreBulletDynamics::RigidBody *defaultBody = new OgreBulletDynamics::RigidBody(
-				"defaultBoxRigid" + StringConverter::toString(mNumEntitiesInstanced),
-				mWorld);
+				"defaultBoxRigid" + StringConverter::toString(physicsManager->getEntitiesInstanced()),
+				physicsManager->getMWorld());
 			defaultBody->setShape(node,
 				sceneBoxShape,
 				0.6f,			// dynamic body restitution
@@ -227,13 +222,17 @@ public:
 				100.0f, 			// dynamic bodymass
 				position,		// starting position of the box
 				Quaternion(0, 0, 0, 1));// orientation of the box
-			mNumEntitiesInstanced++;
+			//mNumEntitiesInstanced++;
+			physicsManager->setEntitiesInstanced(physicsManager->getEntitiesInstanced()+1);
 
 			defaultBody->setLinearVelocity(
 				mCamera->getDerivedDirection().normalisedCopy() * 7.0f); // shooting speed
 																		 // push the created objects to the dequese
-			mShapes.push_back(sceneBoxShape);
-			mBodies.push_back(defaultBody);
+			//mShapes.push_back(sceneBoxShape);
+			//mBodies.push_back(defaultBody);
+
+			physicsManager->addMshapes(sceneBoxShape);
+			physicsManager->addMbodies(defaultBody);
 
 		}
 
@@ -370,10 +369,7 @@ private:
 
 	Ogre::Real speed;
 
-	std::deque<OgreBulletDynamics::RigidBody *> mBodies;
-	std::deque<OgreBulletCollisions::CollisionShape *>  mShapes;
-	OgreBulletDynamics::DynamicsWorld *mWorld;
-	int  mNumEntitiesInstanced;
+	PhysicsManager * physicsManager;
 	OgreBulletDynamics::RigidBody *player;
 	Math3D math3D;
 	//Animations
