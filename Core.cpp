@@ -73,7 +73,7 @@ bool Core::go()
 
 	Ogre::String name, locType;
 	Ogre::ConfigFile::SectionIterator secIt = cf.getSectionIterator();
-
+//Test line comment 
 	while (secIt.hasMoreElements())
 	{
 		Ogre::ConfigFile::SettingsMultiMap* settings = secIt.getNext();
