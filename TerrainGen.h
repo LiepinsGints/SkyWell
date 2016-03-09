@@ -218,6 +218,6 @@ private:
 	Ogre::Real maxBatchSize;
 
 };
-
+/*Lecture 3 test*/
 
 #endif
