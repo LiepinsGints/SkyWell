@@ -6,7 +6,7 @@
 #include <Terrain/OgreTerrainGroup.h>
 
 #include "string.h" // for the memcpy
-//Bullet
+//Bullet -comment for lecture
 #include "OgreBulletDynamicsRigidBody.h"				 // for OgreBullet
 #include "Shapes/OgreBulletCollisionsStaticPlaneShape.h" // for static planes
 #include "Shapes/OgreBulletCollisionsBoxShape.h"		 // for Boxes
